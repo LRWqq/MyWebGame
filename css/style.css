@@ -1,0 +1,383 @@
+/* General body styling */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/* Game container */
+.game-container {
+    width: 80%; /* 擴展後的寬度 */
+    height: 90%; /* 擴展後的高度 */
+    margin: 0 auto; /* 居中佈局 */
+    position: relative;
+}
+
+.game-btn {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ffcc00, #ff9900);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: 0.3s ease, transform 0.2s ease;
+}
+
+.game-btn:hover {
+    background: linear-gradient(135deg, #ff9900, #ff6600);
+    transform: scale(1.05);
+}
+
+.game-container img {
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+#character {
+    z-index: 3;
+}
+
+#gameMap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1000px;
+    height: 400px;
+}
+
+text {
+    fill: #5c5c5c; /* 文字顏色 */
+    font-family: 'Roboto', sans-serif; /* 文字字體 */
+    font-size: 12px; /* 文字大小 */
+}
+
+
+#enterLevelBtn {
+    bottom: 20px;
+}
+
+#prevLevelBtn {
+    bottom: 70px;
+    left: 35%;
+}
+
+#nextLevelBtn {
+    bottom: 70px;
+    left: 65%;
+}
+
+/* Add yellow-blue gradient to main screen */
+#mainPage {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to left, orange, yellow, rgb(0, 136, 255)); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 半透明白色+挖空文字，只作用在背景層 */
+#mainPage::before {
+  content: "TZAI WU";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10rem;
+  font-weight: bold;
+
+  /* 關鍵：把文字當成透明遮罩 */
+  color: rgba(255, 255, 255, 0.7);
+  mix-blend-mode: destination-out;
+  pointer-events: none;
+}
+
+/* 確保內容在上層 */
+#mainPage > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Level page background styling */
+#levelPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+}
+
+/* Back to Main button styling - Centered at the bottom of the level page */
+#backToMainBtn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Level-specific background images */
+.level-background {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    border-radius: 10px;
+}
+
+.level-1-bg {
+    background-color: rgb(158, 225, 235);
+    background-image: url('../images/DSC_8571.JPG');
+    background-size: 30%; 
+    background-position: center; /* 背景圖片位於中間 */
+    background-repeat: no-repeat; /* 防止背景重複 */
+    width: 100vw;
+    height: 100vh;
+}
+
+.level-2-bg {
+    background: 
+        url('../images/25載耶/P.JPG'),
+        linear-gradient(to top, rgb(247, 149, 144), rgb(198, 236, 145));
+    background-size: 30% auto, cover; /* 第一層圖片大小是30%寬，高度自適應；第二層漸層覆蓋整頁 */
+    background-position: center, center; /* 圖片和漸層都居中 */
+    background-repeat: no-repeat, no-repeat; /* 防止重複 */
+    width: 100vw;
+    height: 100vh;
+}
+
+.level-3-bg {
+    background-color: rgb(148, 174, 247);
+    background-image: url('../images/25交接/G_.jpg');
+    background-size: 30%; /* 圖片大小為80% */
+    background-position: center; /* 背景圖片位於中間 */
+    background-repeat: no-repeat; /* 防止背景重複 */
+    width: 100vw;
+    height: 100vh;
+}
+
+.level-4-bg {
+    background-color: rgb(208, 230, 120);
+    background-image: url('../images/26載營/cover.JPG');
+    background-size: 30%; /* 圖片大小為80% */
+    background-position: center; /* 背景圖片位於中間 */
+    background-repeat: no-repeat; /* 防止背景重複 */
+    width: 100vw;
+    height: 100vh;
+}
+
+.level-5-bg {
+    background: 
+        url('../images/26載耶/P13.JPG'),
+        linear-gradient(to top, rgb(247, 149, 144), rgb(198, 236, 145));
+    background-size: 30% auto, cover; /* 第一層圖片大小是30%寬，高度自適應；第二層漸層覆蓋整頁 */
+    background-position: center, center; /* 圖片和漸層都居中 */
+    background-repeat: no-repeat, no-repeat; /* 防止重複 */
+    width: 100vw;
+    height: 100vh;
+}
+
+.level-6-bg {
+    background-color: rgb(148, 174, 247);
+    background-image: url('');
+    background-size: 30%; /* 圖片大小為80% */
+    background-position: center; /* 背景圖片位於中間 */
+    background-repeat: no-repeat; /* 防止背景重複 */
+    width: 100vw;
+    height: 100vh;
+}
+
+#levelCharacter {
+    position: absolute;
+    width: 40px; /* Adjust width and height as needed */
+    height: 40px;
+}
+
+/* Mission point styling */
+.missionpoint {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+/* Add styling for mission point */
+#missionPoint {
+    z-index: 2; /* Ensure it's visible above other elements */
+}
+
+#albumModal {
+    display: none; /* 初始為隱藏 */
+    justify-content: center;
+    align-items: flex-start; /* 保持在上半部 */
+    background-color: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 5%; 
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.album-cover {
+    width: 100px;
+    height: 100px;
+    object-fit: contain; /* 保持原比例並顯示完整 */
+    background-color: white; /* 加上白邊填充 */
+    border-radius: 10px;
+    padding: 5px; /* 增加圖片與按鈕邊界距離 */
+}
+
+
+/* 照片提供者小字樣式 */
+#photoProvider {
+    font-size: 12px;
+    color: #888;
+    margin-top: 10px;
+}
+
+.corner-text {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.3);  /* 半透明背景 */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 1000;
+}
+
+.corner-image {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 100px; 
+    height: 100px;
+    background-image: url('../images/keyb.png'); /* 圖片路徑 */
+    background-size: contain; /* 保持圖片比例 */
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1000; /* 確保圖片位於最上層 */
+}
+
+/* 通用樣式 */
+.page-title {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 4em;
+    text-align: center;
+}
+
+/* 特定頁面樣式 */
+.page-title {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 500;
+    font-style: normal;
+    color: #333;
+}
+
+.info-box {
+    position: fixed; 
+    bottom: 50px; /* 距離螢幕底部 20px */
+    left: 50px; /* 距離螢幕左邊 20px */
+    background-color: rgba(42, 41, 41, 0.3); 
+    color: white; 
+    padding: 15px 20px; /* 內邊距，讓文字不緊貼邊框 */
+    border-radius: 10px; /* 圓角邊框 */
+    font-size: 13px; 
+    line-height: 1.5; /* 行高 */
+    max-width: 300px; /* 限制最大寬度 */
+}
+
+.t-box {
+    position: fixed; 
+    bottom: 30px; /* 距離螢幕底部*/
+    right: 230px; 
+    background-color: rgba(200, 158, 33, 0.3); 
+    color: rgb(0, 0, 0); 
+    padding: 10px; /* 內邊距，讓文字不緊貼邊框 */
+    border-radius: 10px; /* 圓角邊框 */
+    font-size: 15px; 
+    line-height: 1.2; /* 行高 */
+}
+
+
+/* 按鈕樣式 */
+#triangleButtonContainer {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+}
+#triangleButton {
+    padding: 10px 20px;
+    background-color: #85a4f8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#triangleButton:hover {
+    background-color: #0056b3;
+}
+
+/* 圖片容器樣式 */
+#triangleImages {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    bottom: 100px; /* 與按鈕位置保持距離 */
+    right: 100px;
+    text-align: center;
+    width: 200px;
+    height: 200px;
+}
+
+
+.triangle-img {
+    position: absolute;
+    width: 60px; /* 設定圖片容器的直徑 */
+    height: 60px;
+    border-radius: 50%; /* 圓形效果 */
+    object-fit: cover; /* 維持圖片比例並裁切至容器大小 */
+    transition: all 0.5s ease; /* 平滑的跳出動畫 */
+    opacity: 0; /* 初始隱藏 */
+}
+
+#img1 {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+#img2 {
+    bottom: 0;
+    left: 0;
+}
+#img3 {
+    bottom: 0;
+    right: 0;
+}

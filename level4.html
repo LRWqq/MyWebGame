@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H684HRPWWT"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-H684HRPWWT');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+Mono+TC&display=swap');
+    </style>
+    <h1 class="page-title">26載營</h1>
+</head>
+<body class="level-4-bg">
+
+    <div class="corner-image"></div>
+
+    <!-- 創建角色 -->
+    <img id="levelCharacter" src="../images/character.png" alt="Character" style="position: absolute; width: 40px; height: 40px;" />
+
+    <button id="backToMainBtn">返回主頁</button>
+
+    <p class="corner-text">活動照片：26載營攝影股</p>
+
+    <!-- 小相簿模態視窗 -->
+        <div id="albumModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center;">
+            <div class="album-content" style="position: relative; background: white; padding: 20px; max-width: 500px; max-height: 500px; text-align: center;">
+                <img id="albumImage" style="max-width: 100%; max-height: 400px;"/>
+                
+                <div style="margin-top: 10px;">
+                    <button id="prevPhotoBtn">上一張</button>
+                    <button id="nextPhotoBtn">下一張</button>
+                </div>
+                <button id="closeAlbumBtn" style="position: absolute; top: 10px; right: 10px;">關閉</button>
+            </div>
+        </div>
+        
+
+    <script>
+    // 角色初始位置
+    let characterX = 100;
+    let characterY = 100;
+    let speed = 5;  // 角色移動速度
+    let activeDialogueBox = null;
+
+    // 顯示角色
+    const character = document.getElementById('levelCharacter');
+    character.style.left = `${characterX}px`;
+    character.style.top = `${characterY}px`;
+
+    const levelConfig4 = {
+    missions: [
+        { point: { x: 300, y: 200 }, albumKey: 'A', imageUrl: 'images/26載營/A1.jpg', touch: 0, type:'' },
+        { point: { x: 400, y: 100 }, albumKey: 'P', imageUrl: 'images/26載營/P1.JPG', touch: 0, type:'' },
+        { point: { x: 100, y: 300 }, albumKey: 'T', imageUrl: 'images/26載營/T1.JPG', touch: 0, type:'' },
+        { point: { x: 1100, y: 300 },type: 'quiz', 
+                question: '你是哪家？：', 
+                options: ['1家', '2家', '3家', '5家', '6家', 
+                        '7家', '8家', '9家', '10家', '11家', '12家', '13家','大合照！'],  
+                imageUrl:"/images/26載營/Gall.png",
+                touch:0,
+                ima: [
+                    "url('images/26載營/G1.JPG')",  
+                    "url('images/26載營/G2.jpeg')", 
+                    "url('')",
+                    "url('images/26載營/G5.HEIC')", 
+                    "url('images/26載營/G6.JPG')",
+                    "url('images/26載營/G7.JPG')", 
+                    "url('images/26載營/G6.JPG')",
+                    "url('images/26載營/G9.JPG')",
+                    "url('images/26載營/G10.JPG')", 
+                    "url('images/26載營/G11.JPG')",
+                    "url('images/26載營/G12.JPG')",
+                    "url('images/26載營/G13.JPG')",
+                    "url('images/26載營/Gall.png')"
+                ]
+
+            },
+        { point: { x: 700, y: 500 }, albumKey: 'G_', imageUrl: 'images/26載營/G_6.JPG', touch: 0, type:'' }
+    ]
+
+    };
+
+    
+    // 創建任務點
+function createMissionPoint(levelConfig4) {
+    levelConfig4.missions.forEach((mission) => {
+        const missionPoint = document.createElement('div');
+        missionPoint.style.position = 'absolute';
+        missionPoint.style.left = `${mission.point.x}px`;
+        missionPoint.style.top = `${mission.point.y}px`;
+        missionPoint.style.width = '40px';
+        missionPoint.style.height = '40px';
+        missionPoint.style.borderRadius = '50%';
+        missionPoint.style.zIndex = '2';
+
+        // 設定背景圖片或默認顏色
+        if (mission.imageUrl) {
+            missionPoint.style.backgroundImage = `url('${mission.imageUrl}')`;
+            missionPoint.style.backgroundSize = 'cover';
+            missionPoint.style.backgroundPosition = 'center';
+        } else {
+            missionPoint.style.backgroundColor = 'red';  // 默認紅色
+        }
+
+        // 如果是 quiz 類型，設定 dataset 類型
+        if (mission.type === 'quiz') {
+            missionPoint.dataset.type = 'quiz';
+        }
+
+        // 設置 albumKey 到 dataset 中以便碰撞檢測中使用
+        missionPoint.dataset.albumKey = mission.albumKey;
+        
+        document.body.appendChild(missionPoint);
+    });
+}
+
+
+    // 顯示第二關的任務點
+    createMissionPoint(levelConfig4);
+
+    // 角色移動
+    function updateCharacterPosition() {
+        character.style.left = `${characterX}px`;
+        character.style.top = `${characterY}px`;
+        checkCollisionWithMissions(characterX, characterY);
+    }
+
+    // 鍵盤事件處理器
+    document.addEventListener('keydown', (event) => {
+        switch (event.key) {
+            case 'ArrowUp':
+                characterY -= speed;
+                break;
+            case 'ArrowDown':
+                characterY += speed;
+                break;
+            case 'ArrowLeft':
+                characterX -= speed;
+                break;
+            case 'ArrowRight':
+                characterX += speed;
+                break;
+        }
+        updateCharacterPosition();  // 每次移動更新角色位置
+    });
+
+    function checkCollisionWithMissions(x, y) {
+        console.log(x,y);
+
+    levelConfig4.missions.forEach((mission) => {
+        const { point, albumKey, type } = mission;  // 從 mission 中取得 albumKey 和座標
+        const distance = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2);
+
+        if (distance < 40 && mission.touch === 0) {  
+            if (albumKey) {
+                console.log("碰撞到任務點，打開相簿");
+                openAlbum(albumKey);
+                mission.touch = 1;  
+            }else if (type == 'quiz') {
+                handleQuizMission(mission);
+            }
+        } else if (distance > 80 && mission.touch === 1) {  
+            console.log("Left mission area");
+            mission.touch = 0; 
+        }
+    });
+}
+
+
+var currentPhotos = []; // 使用 currentPhotos
+
+// 打開相簿並定義相簿資料
+function openAlbum(albumKey) {
+    const photoAlbums = {
+        A: [
+            "images/26載營/A1.jpg", 
+            "images/26載營/A2.jpg", 
+            "images/26載營/A3.jpg", 
+            "images/26載營/A4.jpg", 
+            "images/26載營/A5.jpg", 
+            "images/26載營/A6.JPG"
+        ],
+        G_: [
+            "images/26載營/G_1.JPG", 
+            "images/26載營/G_12.jpg", 
+            "images/26載營/G_6.JPG", 
+            "images/26載營/G_7.JPG"
+        ],
+        P: [
+            "images/26載營/P0.jpg", 
+            "images/26載營/P1.JPG", 
+            "images/26載營/P2.JPG", 
+            "images/26載營/P3.jpg", 
+            "images/26載營/P4.JPG", 
+            "images/26載營/P5.JPG"
+        ],
+        T: [
+            "images/26載營/T1.JPG", 
+            "images/26載營/T2.JPG", 
+            "images/26載營/T3.JPG", 
+            "images/26載營/T4.jpg"
+        ]
+    };
+
+
+
+    currentPhotos = photoAlbums[albumKey] || [];  // 將相簿設為 currentPhotos
+    if (currentPhotos.length > 0) {
+        currentPhotoIndex = 0;
+        albumImage.src = currentPhotos[currentPhotoIndex];
+        albumModal.style.display = "flex";
+    }
+}
+
+// 處理選擇題任務
+function handleQuizMission(mission) {
+        showQuizDialog(mission.question, mission.options, mission.ima);
+    }
+
+
+    let activeDialog = null;  // Global variable to keep track of the active dialog
+
+    // 顯示選擇題對話框
+    function showQuizDialog(question, options, ima) {
+        if (activeDialogueBox) {
+            activeDialogueBox.remove();
+        }
+
+        if (activeDialog) {
+            activeDialog.remove();
+            activeDialog = null;
+        }
+
+        const dialogueBox = document.createElement('div');
+        dialogueBox.style.position = 'absolute';
+        dialogueBox.style.left = '50%';
+        dialogueBox.style.top = '50%';
+        dialogueBox.style.transform = 'translate(-50%, -50%)';
+        dialogueBox.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+        dialogueBox.style.border = '2px';
+        dialogueBox.style.padding = '20px';
+        dialogueBox.style.zIndex = '1000';
+        dialogueBox.style.maxWidth = '300px';
+        dialogueBox.style.textAlign = 'center';
+
+        // 問題文字
+        const questionText = document.createElement('p');
+        questionText.textContent = question;
+        dialogueBox.appendChild(questionText);
+
+        // Close button for the quiz dialog
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.style.position = 'absolute';
+        closeButton.style.right = '10px';
+        closeButton.style.top = '10px';
+        closeButton.style.zIndex = '1001';
+        closeButton.onclick = () => {
+            dialogueBox.remove();
+            activeDialog = null;  // Clear the active dialog
+        };
+        dialogueBox.appendChild(closeButton);
+
+        // 選項按鈕
+        options.forEach((option, index) => {
+            const optionButton = document.createElement('button');
+            optionButton.textContent = option;
+            optionButton.style.display = 'block';
+            optionButton.style.margin = '5px auto';
+
+            // 當按下選項按鈕時顯示對應的圖片
+            optionButton.addEventListener('click', () => {
+                displayImage(ima[index]);  // 顯示相應的圖片
+                dialogueBox.remove();
+                activeDialogueBox = null;
+            });
+
+            dialogueBox.appendChild(optionButton);
+        });
+
+        document.body.appendChild(dialogueBox);
+        activeDialogueBox = dialogueBox;
+    }
+
+    // 顯示圖片的函數
+    function displayImage(imageUrl) {
+        if (!imageUrl) {
+            alert('沒有圖片');
+            return;
+        }
+
+        if (activeDialog) {
+            activeDialog.remove();
+            activeDialog = null;
+        }
+
+        // Check if imageUrl is provided
+        if (!imageUrl) return;
+
+        // Create dialog box to display the image
+        const imageDialog = document.createElement('div');
+        imageDialog.style.position = 'absolute';
+        imageDialog.style.left = '50%';
+        imageDialog.style.top = '50%';
+        imageDialog.style.transform = 'translate(-50%, -50%)';
+        imageDialog.style.width = '400px';
+        imageDialog.style.height = '300px';
+        imageDialog.style.backgroundImage = imageUrl;
+        imageDialog.style.backgroundSize = 'cover';
+        imageDialog.style.backgroundPosition = 'center';
+        imageDialog.style.border = '2px';
+        imageDialog.style.zIndex = '1000';
+        imageDialog.style.padding = '10px';
+
+        // Create close button
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.style.position = 'absolute';
+        closeButton.style.right = '10px';
+        closeButton.style.top = '10px';
+        closeButton.style.zIndex = '1001';
+        closeButton.onclick = () => {
+            imageDialog.remove();
+            activeDialog = null;  // Clear active dialog when closed
+        };
+
+        // Append close button to the dialog
+        imageDialog.appendChild(closeButton);
+        document.body.appendChild(imageDialog);
+
+        // Set the active dialog
+        activeDialog = imageDialog;
+    }
+
+    function handleQuizMission(mission) {
+    // Close any active dialog before opening a new one
+    if (activeDialog) {
+            activeDialog.remove();
+            activeDialog = null;
+        }
+        showQuizDialog(mission.question, mission.options, mission.ima);
+    }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const albumModal = document.getElementById("albumModal");
+    const albumImage = document.getElementById("albumImage");
+    let currentPhotoIndex = 0;
+
+    // 關閉相簿
+    document.getElementById("closeAlbumBtn").addEventListener("click", () => {
+        albumModal.style.display = "none";
+    });
+
+    // 前一張圖片
+    document.getElementById("prevPhotoBtn").addEventListener("click", () => {
+        if (currentPhotoIndex > 0) {
+            currentPhotoIndex--;
+        } else {
+            currentPhotoIndex = currentPhotos.length - 1;
+        }
+        albumImage.src = currentPhotos[currentPhotoIndex];
+    });
+
+    // 下一張圖片
+    document.getElementById("nextPhotoBtn").addEventListener("click", () => {
+        if (currentPhotoIndex < currentPhotos.length - 1) {
+            currentPhotoIndex++;
+        } else {
+            currentPhotoIndex = 0;
+        }
+        albumImage.src = currentPhotos[currentPhotoIndex];
+    });
+});
+    </script>
+
+    <script>
+    // 返回主頁按鈕
+    document.getElementById('backToMainBtn').addEventListener('click', () => {
+        window.location.href = 'index.html'; 
+    });
+    </script>
+</body>
+</html>
